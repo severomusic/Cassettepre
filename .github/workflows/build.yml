@@ -1,0 +1,30 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install JUCE
+      run: |
+        git clone https://github.com/juce-framework/JUCE.git ~/JUCE
+    
+    - name: Generate Xcode project
+      run: |
+        ~/JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer --resave Cassettepreamp.jucer
+    
+    - name: Build VST3
+      run: |
+        xcodebuild -project Builds/MacOSX/Cassettepreamp.xcodeproj -scheme "Cassettepreamp - VST3" -configuration Release
+    
+    - name: Upload VST3
+      uses: actions/upload-artifact@v3
+      with:
+        name: Cassettepreamp-VST3
+        path: Builds/MacOSX/build/Release/Cassettepreamp.vst3
