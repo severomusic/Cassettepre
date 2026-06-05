@@ -24,7 +24,7 @@ jobs:
         xcodebuild -project Builds/MacOSX/Cassettepreamp.xcodeproj -scheme "Cassettepreamp - VST3" -configuration Release
     
     - name: Upload VST3
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Cassettepreamp-VST3
         path: Builds/MacOSX/build/Release/Cassettepreamp.vst3
