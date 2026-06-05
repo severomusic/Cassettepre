@@ -6,25 +6,29 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Install JUCE
       run: |
-        git clone https://github.com/juce-framework/JUCE.git ~/JUCE
-    
-    - name: Generate Xcode project
+        git clone https://github.com/juce-framework/JUCE.git ~/JUCE --depth 1
+
+    - name: Configure CMake
       run: |
-        ~/JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer --resave Cassettepreamp.jucer
-    
+        cmake -B Build -G Xcode \
+          -DCMAKE_OSX_ARCHITECTURES=arm64 \
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+          -DJUCE_PATH=~/JUCE \
+          -S .
+
     - name: Build VST3
       run: |
-        xcodebuild -project Builds/MacOSX/Cassettepreamp.xcodeproj -scheme "Cassettepreamp - VST3" -configuration Release
-    
+        cmake --build Build --config Release
+
     - name: Upload VST3
       uses: actions/upload-artifact@v4
       with:
         name: Cassettepreamp-VST3
-        path: Builds/MacOSX/build/Release/Cassettepreamp.vst3
+        path: Build/**/*.vst3
